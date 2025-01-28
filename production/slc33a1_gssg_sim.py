@@ -1,3 +1,25 @@
+"""
+Script name: slc33a1_gssg_sim.py
+
+Intended Use:
+This script is intended to run a 500 ns molecular dynamics simulation of SLC33A1 
+with or without GSSG bound in a lipid bilayer with waters and ions under CHARMMFF. 
+It can also be adapted for different types of simulations by changing the input 
+parameters in the YAML configuration.
+
+Requirements:
+- OpenMM (Version 7.7.0, maybe be incompatible with earlier or later versions)
+- MDTraj for trajectory output (DCD format)
+- YAML for configuration parsing
+- CHARMM parameter and topology files
+- JSON
+
+Ensure the appropriate libraries are installed and that the paths to input files 
+are correctly set in `sim_params.yaml` before running the script.
+
+"""
+
+
 from sys import stdout
 import mdtraj as md 
 import openmm as mm
@@ -6,12 +28,8 @@ from openmm import LangevinMiddleIntegrator
 from openmm.app import CharmmPsfFile, PDBFile, PDBxFile, CharmmParameterSet
 import simtk.unit as unit 
 import os, time, yaml, bz2
-from openmm import CustomExternalForce
 import json
-import yaml
-import random
 
-seed = random.randint(0, 1000000)  # Random seed for reproducibility
 
 ### Open YAML file containing simulation parameters
 
@@ -23,29 +41,27 @@ with open('sim_params.yaml') as file: # Load YAML containing location of project
     
 input_filepath=params['input_paths']['input_filepath']
     
-psf = CharmmPsfFile(input_filepath+'/step3_input.psf')
-pdb = PDBFile(input_filepath+'/step3_input.pdb')
+psf = CharmmPsfFile(input_filepath+'step5_input.psf')
+pdb = PDBFile(input_filepath+'step5_input.pdb')
 
 state_file = input_filepath+params['input_paths']['state_filepath']
 
 ### Load paramter files
 param_filepath = params['input_paths']['param_filepath']
 param_filenames = params['input_paths']['param_filenames']
+sim_params=params['sim_params']
 restraint_params=params['restraint_params']
 output_filenames=params['output_paths']
-sim_params=params['sim_params']
 
-
+param_paths = [os.path.join(param_filepath, file) for file in param_filenames]
+params = CharmmParameterSet(*param_paths)
 
 ### Set system parameters (load from sysinfo.dat)
-sys_info_path = sim_params['input_paths']['sys_info_data_path']
-
+sys_info_path = '../input/openmm/sysinfo.dat'
 with open(sys_info_path) as sysdata:
 	data = json.load(sysdata)
 	x,y,z=map(float,data['dimensions'][:3]) * unit.angstroms
 
-param_paths = [os.path.join(param_filepath, file) for file in param_filenames]
-params = CharmmParameterSet(*param_paths)
 
 psf.setBox(x,y,z) # Matches box size set by CHARMM
 
@@ -82,27 +98,20 @@ barostat.setFrequency(50)
 system.addForce(barostat)
 
 simulation = app.Simulation(psf.topology, system, integrator)
-
     
 with bz2.open(state_file, 'rb') as infile:
         state = mm.XmlSerializer.deserialize(infile.read().decode())
 
 simulation.context.setPeriodicBoxVectors(*state.getPeriodicBoxVectors())
 simulation.context.setPositions(state.getPositions())
+simulation.context.setVelocities(state.getVelocities())
 
-# Randomize velocities using the seed
-simulation.context.setVelocitiesToTemperature(temperature, seed)
-
-# Log the seed to stdout and a log file
-print(f"Random seed used for velocity initialization: {seed}")
-
-
-### Simulation stuff
+### Simulation parameters
 
 nsteps= sim_params['nsteps'] 
 report_freq= sim_params['report_freq'] 
 chk_freq= sim_params['chk_freq'] 
-traj_freq= sim_params['traj_freq']  
+traj_freq= sim_params['traj_freq']  # every 1ns at 4fs / step
 
 current_time = simulation.context.getState().getTime() / unit.nanoseconds
 total_simulation_time = nsteps*time_step / unit.nanoseconds
@@ -113,59 +122,6 @@ traj_freq_time = traj_freq * time_step/ unit.nanoseconds
 report_freq_time = report_freq*time_step / unit.nanoseconds
 
 chk_freq_time = chk_freq * time_step / unit.nanoseconds
-
-
-
-### Apply custom restraint forces (for equilibration)
-
-restraint_type = params['restraint_params']['restraint_type']
-restraint_k=params['restraint_params']['restraint_k'] # kJ/mol/nm^2
-
-posresPROT = CustomExternalForce('k*periodicdistance(x, y, z, x0, y0, z0)^2;')
-posresPROT.addGlobalParameter('k', restraint_k)
-posresPROT.addPerParticleParameter('x0')
-posresPROT.addPerParticleParameter('y0')
-posresPROT.addPerParticleParameter('z0')
-
-crd = simulation.context.getState(getPositions=True).getPositions()
-system = simulation.context.getSystem()
-
-atoms = [atom for atom in simulation.topology.atoms()]
-
-for i, atom_crd in enumerate(crd):
-    
-    if (atoms[i].residue.id == ('1909') or 
-        atoms[i].residue.id == ('1910') or 
-        atoms[i].residue.id == ('1911') or
-	atoms[i].residue.id == ('1912') or
-	atoms[i].residue.id == ('1913') or
-	atoms[i].residue.id == ('1914') or
-	atoms[i].residue.id == ('1915') or
-        atoms[i].residue.id == ('2214') or 
-        atoms[i].residue.id == ('2215') or 
-        atoms[i].residue.id == ('2216') or 
-        atoms[i].residue.id == ('2549') or
-        atoms[i].residue.id == ('2550') or
-        atoms[i].residue.id == ('2551') or
-	atoms[i].residue.id == ('2634') or 
-	atoms[i].residue.id == ('2635') or
-	atoms[i].residue.id == ('2636')
-        ) and (atoms[i].residue.chain == atoms[0].residue.chain or # Checks if the residue is in chain A.
-               
-               atoms[i].residue.chain == atoms[5000].residue.chain # Checks if the residue is in chain B.
-               
-               ) and (atoms[i].name in ('CA','C','N')): # Applies the restraints to backbone atoms only.
-        
-        print(i,crd)
-        posresPROT.addParticle(i,atom_crd.value_in_unit(unit.nanometers))
-        
-force_id = system.addForce(posresPROT)
-
-simulation.context.reinitialize(preserveState=True)
-
-forces = [force for force in simulation.context.getSystem().getForces()]
-
-print(f'Successfully added force: {forces[force_id]}')
 
 ### Set output stuff
 
@@ -197,6 +153,7 @@ simulation.reporters.append(
 )
 
 # Write to checkpoint files regularly:
+
 simulation.reporters.append(app.CheckpointReporter(
     file=checkpoint_filename,
     reportInterval=chk_freq
@@ -217,9 +174,7 @@ initial_time = time.time()
 simulation.step(steps_left)
 elapsed_time = (time.time() - initial_time) * unit.seconds
 simulation_time = nsteps * time_step
-print('    Equilibration took %.3f s for %.3f ns (%8.3f ns/day)' % (elapsed_time / unit.seconds, simulation_time / unit.nanoseconds, simulation_time / elapsed_time * unit.day / unit.nanoseconds))
-
-
+print('    Simulation took %.3f s for %.3f ns (%8.3f ns/day)' % (elapsed_time / unit.seconds, simulation_time / unit.nanoseconds, simulation_time / elapsed_time * unit.day / unit.nanoseconds))
 
 # Save and serialize the final state
 print("Serializing state to %s" % state_xml_filename)
@@ -285,8 +240,10 @@ with bz2.open(system_xml_filename, "wt") as outfile:
     
     
 integrator_to_write = simulation.context.getIntegrator()
+
 # Save and serialize integrator
 print("Serializing integrator to %s" % integrator_xml_filename)
 with bz2.open(integrator_xml_filename, "wt") as outfile:
     xml = mm.XmlSerializer.serialize(integrator_to_write)
     outfile.write(xml)
+
