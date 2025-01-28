@@ -9,6 +9,7 @@ import os, time, yaml, bz2
 from openmm import CustomExternalForce
 import json
 import yaml
+import random
 
 seed = random.randint(0, 1000000)  # Random seed for reproducibility
 
