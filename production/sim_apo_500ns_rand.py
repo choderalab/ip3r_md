@@ -34,11 +34,13 @@ param_filenames = params['input_paths']['param_filenames']
 restraint_params=params['restraint_params']
 output_filenames=params['output_paths']
 sim_params=params['sim_params']
+input_params=params['input_paths']
+restraint_params=params['restraint_params']
 
 
 
 ### Set system parameters (load from sysinfo.dat)
-sys_info_path = sim_params['input_paths']['sys_info_data_path']
+sys_info_path = input_params['sys_info_data_path']
 
 with open(sys_info_path) as sysdata:
 	data = json.load(sysdata)
@@ -118,8 +120,8 @@ chk_freq_time = chk_freq * time_step / unit.nanoseconds
 
 ### Apply custom restraint forces (for equilibration)
 
-restraint_type = params['restraint_params']['restraint_type']
-restraint_k=params['restraint_params']['restraint_k'] # kJ/mol/nm^2
+restraint_type = restraint_params['restraint_type']
+restraint_k=restraint_params['restraint_k'] # kJ/mol/nm^2
 
 posresPROT = CustomExternalForce('k*periodicdistance(x, y, z, x0, y0, z0)^2;')
 posresPROT.addGlobalParameter('k', restraint_k)
@@ -137,19 +139,19 @@ for i, atom_crd in enumerate(crd):
     if (atoms[i].residue.id == ('1909') or 
         atoms[i].residue.id == ('1910') or 
         atoms[i].residue.id == ('1911') or
-	atoms[i].residue.id == ('1912') or
-	atoms[i].residue.id == ('1913') or
-	atoms[i].residue.id == ('1914') or
-	atoms[i].residue.id == ('1915') or
+	    atoms[i].residue.id == ('1912') or
+	    atoms[i].residue.id == ('1913') or
+	    atoms[i].residue.id == ('1914') or
+	    atoms[i].residue.id == ('1915') or
         atoms[i].residue.id == ('2214') or 
         atoms[i].residue.id == ('2215') or 
         atoms[i].residue.id == ('2216') or 
         atoms[i].residue.id == ('2549') or
         atoms[i].residue.id == ('2550') or
         atoms[i].residue.id == ('2551') or
-	atoms[i].residue.id == ('2634') or 
-	atoms[i].residue.id == ('2635') or
-	atoms[i].residue.id == ('2636')
+	    atoms[i].residue.id == ('2634') or 
+	    atoms[i].residue.id == ('2635') or
+	    atoms[i].residue.id == ('2636')
         ) and (atoms[i].residue.chain == atoms[0].residue.chain or # Checks if the residue is in chain A.
                
                atoms[i].residue.chain == atoms[5000].residue.chain # Checks if the residue is in chain B.
