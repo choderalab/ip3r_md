@@ -2,9 +2,11 @@ input_paths:
   input_filepath: '../input/openmm'
   state_filepath: '/step4_equilibration.rst.bz2'
   param_filepath: '../input/toppar'
-  param_filenames: ['par_all36m_prot.prm', 'top_all36_prot.rtf',
-                       'par_all36_lipid.prm', 'top_all36_lipid.rtf',
-                       'toppar_water_ions.str']
+
+  param_filenames: ['par_all36m_prot.prm', 'top_all36_prot.rtf', 'par_all36_lipid.prm', 'top_all36_lipid.rtf','toppar_water_ions.str',
+                    'par_all36_cgenff.prm',
+                    'top_all36_cgenff.rtf','par_all36_na.prm','top_all36_na.rtf','toppar_all36_na_nad_ppi.str']
+
   sys_info_data_path: '../input/openmm/sysinfo.dat'
 
 
@@ -35,4 +37,3 @@ output_paths:
   system_xml_filename: "system.xml.bz2"
   checkpoint_filename: "output.chk"
   traj_output_filename: "output.dcd"
-

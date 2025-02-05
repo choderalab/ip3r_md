@@ -20,9 +20,13 @@ distance_cutoff = 0.25
 # Interaction frequency cutoff for visualization (in percent)
 interaction_cutoff = 0.0  
 
+# Whether to plot only residues above the cutoff (True) or all residues (False)
+plot_only_residues_above_cutoff = True  # or False, depending on user preference
+
+
 # Set stride value
 
-stride=500
+stride=0
 
 #############################
 # Load trajectories for each ligand
@@ -121,6 +125,10 @@ print(df)
 
 # Optionally, filter the DataFrame so that only cells with interaction frequency above the cutoff are shown.
 filtered_df = df.where(df >= interaction_cutoff)
+
+# Drop rows that are NaN in *all* columns if the user wants to plot only residues above the cutoff.
+if plot_only_residues_above_cutoff:
+    filtered_df = filtered_df.dropna(how='all')
 
 #############################
 # Plot heatmap
