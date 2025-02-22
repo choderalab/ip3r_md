@@ -1,0 +1,38 @@
+input_paths:
+  input_filepath: '../input/openmm'
+  state_filepath: '/step5_9.rst.bz2'
+  param_filepath: '../input/toppar'
+  param_filenames: ['par_all36m_prot.prm', 'top_all36_prot.rtf',
+                       'par_all36_lipid.prm', 'top_all36_lipid.rtf',
+                       'toppar_water_ions.str']
+  sys_info_data_path: '../input/openmm/sysinfo.dat'
+
+
+sim_params:
+  nonbonded_method: app.PME
+  constraints: app.HBonds
+  hydrogen_mass: 4.0 
+  temperature: 303.15 
+  friction: 1 
+  time_step: 0.004 
+  pressure: 1 # *unit.bar
+  surface_tension: 0 
+  nsteps: 125000000 
+  report_freq: 25000 
+  chk_freq: 12500000 
+  traj_freq: 250000
+
+restraint_params:
+  restraint_type: 'backbone'
+  restraint_k: 10 
+
+
+output_paths:
+  integrator_xml_filename: "integrator.xml.bz2"
+  state_xml_filename: "state.xml.bz2"
+  state_pdb_filename: "output.pdb"
+  state_pdbx_filename: "output.cif"
+  system_xml_filename: "system.xml.bz2"
+  checkpoint_filename: "output.chk"
+  traj_output_filename: "output.dcd"
+
