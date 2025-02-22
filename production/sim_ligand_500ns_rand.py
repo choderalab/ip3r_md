@@ -96,7 +96,8 @@ simulation.context.setPositions(state.getPositions())
 simulation.context.setVelocitiesToTemperature(temperature, seed)
 
 # Log the seed to stdout and a log file
-print(f"Random seed used for velocity initialization: {seed}")
+with open('seed_log.txt', 'w') as seed_file:
+    seed_file.write(f"Random seed used for velocity initialization: {seed}\n")
 
 
 ### Simulation stuff
