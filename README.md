@@ -39,4 +39,16 @@ Simulation trajectories can be analyzed with jupyter notebooks located in `/ip3r
 * `/4production` contains scripts that can be used to simulate systems using OpenMM.
 * `/5analysis` contains scripts that can be used to reproduce analyses done on simulation trajectories and to make figures for "Structural dynamics of adenine nucleotide potentiation of the human type 2 IP3 receptor".
 
+# Citations 
+
+* This work: Please cite (citation here)
+* CHARMMGUI:
+  1. Jo, S., Kim, T., Iyer, V. G. & Im, W. CHARMM-GUI: A web-based graphical user interface for CHARMM. J. Comput. Chem. 29, 1859–1865 (2008).
+  2. Kim, S. et al. CHARMM-GUI ligand reader and modeler for CHARMM force field generation of small molecules. J. Comput. Chem. 38, 1879–1886 (2017).
+  3. Jo, S., Kim, T. & Im, W. Automated Builder and Database of Protein/Membrane Complexes for Molecular Dynamics Simulations. PLOS ONE 2, e880 (2007).
+  4. Lee, J. et al. CHARMM-GUI Input Generator for NAMD, GROMACS, AMBER, OpenMM, and CHARMM/OpenMM Simulations Using the CHARMM36 Additive Force Field. J. Chem. Theory Comput. 12, 405–413 (2016).
+* CHARMM forcefield:
+  1. Huang, J. et al. CHARMM36m: an improved force field for folded and intrinsically disordered proteins. Nat. Methods 14, 71–73 (2017).
+* OpenMM:
+  1. Eastman, P. et al. OpenMM 7: Rapid development of high performance algorithms for molecular dynamics. PLOS Comput. Biol. 13, e1005659 (2017).
 
