@@ -35,7 +35,7 @@ Simulation trajectories can be analyzed with jupyter notebooks located in `/ip3r
 
 * `/1starting_models` contains PDB files of atomic models of monomeric hIP3R2 in the resting state with ATP-bound, cAMP-bound, or in a ligand-free state determined via cryo-EM.
 * `/2model_preparation` contains PDB files that are of monomeric hIP3R2 with only residues 1909 to 2216 and 2549 to 2636 plus Zn2+ and bound ligands.
-* `/3equilibration` contains outputs from CHARMGUI Solution Builder and files required to energy minimize and equilibrate systems using OpenMM
+* `/3equilibration` contains outputs from CHARMGUI Solution Builder and files required to energy minimize and equilibrate systems using OpenMM.
 * `/4production` contains scripts that can be used to simulate systems using OpenMM.
 * `/5analysis` contains scripts that can be used to reproduce analyses done on simulation trajectories and to make figures for "Structural dynamics of adenine nucleotide potentiation of the human type 2 IP3 receptor".
 
