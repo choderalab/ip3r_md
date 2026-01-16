@@ -60,7 +60,7 @@ for ligand in ligands:
     trimmed_traj = trimmed_segments[0].join(trimmed_segments[1:])
     print(f"After trimming: {trimmed_traj.n_frames} frames retained for {ligand}")
 
-    # ---- Apply stride *after* trimming ----
+    # ---- Apply stride following trimming ----
     if stride > 1:
         trimmed_traj = trimmed_traj[::stride]
         print(f"After striding ({stride}): {trimmed_traj.n_frames} frames kept")
